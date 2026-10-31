@@ -7,6 +7,54 @@
 | **Hệ thống được kiểm thử** | Music Library – quản lý thư viện nhạc online (Spring Boot 3.5, Spring Data JPA, Spring Security, Thymeleaf, MySQL) |
 | **Công cụ** | JUnit 5, Mockito, MockMvc, H2, Postman, Apache JMeter 5.6.3, Selenium WebDriver |
 
+## Hướng dẫn chạy dự án
+
+### 1. Chuẩn bị
+
+- Sử dụng Windows và JDK 17. Nếu đã cài Java, kiểm tra bằng `java -version` và đặt `JAVA_HOME` trỏ đến thư mục JDK khi cần.
+- Cần Internet trong lần chạy đầu để Maven tải các thư viện.
+- Không bắt buộc cài Maven riêng vì dự án có Maven Wrapper. Chế độ chạy local sử dụng H2 nên không cần cài hoặc cấu hình MySQL.
+
+Script ưu tiên JDK 17 trong `.local-tools` nếu có, sau đó dùng `JAVA_HOME`, Java trong PATH hoặc JDK đi kèm VS Code. Thư mục `.local-tools` là công cụ và cache riêng trên máy, không được đưa lên Git.
+
+### 2. Khởi động ứng dụng
+
+Mở PowerShell tại **thư mục gốc repo**, nơi có file `Start-Local.cmd`, rồi chạy:
+
+```powershell
+.\Start-Local.cmd
+```
+
+Nếu PowerShell đang ở thư mục chứa README này (`app/MainProject/QuanLyThuVienNhacOnline`), quay về thư mục gốc trước:
+
+```powershell
+cd ..\..\..
+.\Start-Local.cmd
+```
+
+Script tự chuyển đến thư mục ứng dụng `web`, sử dụng profile `local` và khởi động Spring Boot. Lệnh này chỉ chạy ứng dụng, không chạy bộ test JUnit.
+
+Chờ log xuất hiện dòng `Started MusicManagerApplication`, sau đó truy cập **http://localhost:8080**. Giữ cửa sổ chạy server mở trong lúc sử dụng ứng dụng hoặc chạy Postman, Selenium, JMeter.
+
+### 3. Đăng ký và sử dụng
+
+1. Mở http://localhost:8080/register.
+2. Nhập username và email chưa được sử dụng, cùng mật khẩu tối thiểu 8 ký tự.
+3. Đăng nhập tại http://localhost:8080/login.
+4. Truy cập các mục **Artist**, **Song** và **Genre** để xem, tìm kiếm, thêm, sửa hoặc xóa dữ liệu.
+
+Tài khoản tự đăng ký có quyền **User**. Trang `/users` chỉ dành cho tài khoản **Admin** có sẵn; hệ thống không tự tạo tài khoản Admin khi khởi động.
+
+### 4. Dữ liệu và cách dừng
+
+Profile local lưu dữ liệu H2 trong file `web/data/music-library.mv.db` tính từ thư mục chứa README này. Dữ liệu được giữ lại sau khi tắt và chạy lại ứng dụng. Server lắng nghe trên `127.0.0.1:8080` để sử dụng trên máy hiện tại.
+
+Nhấn **Ctrl+C** trong cửa sổ đang chạy để dừng server; nếu xuất hiện câu hỏi `Terminate batch job (Y/N)?`, nhập `Y`. Lần sau, chạy lại `Start-Local.cmd` tại thư mục gốc để khởi động.
+
+Nếu không tìm thấy Java, cài JDK 17 và cấu hình `JAVA_HOME`. Nếu cổng 8080 đang được sử dụng, kiểm tra xem ứng dụng đã chạy ở cửa sổ khác hay chưa và dừng phiên cũ trước khi khởi động lại. Nếu Maven tải thư viện thất bại, kiểm tra kết nối Internet và thông báo lỗi trong cửa sổ chạy.
+
+Xem thêm [hướng dẫn chạy trên máy](../../../CHAY_DU_AN.md) và [cấu hình local](web/src/main/resources/application-local.properties).
+
 ## 1. Mục tiêu và phạm vi
 
 Đề tài tập trung kiểm thử và đánh giá chất lượng hệ thống quản lý thư viện nhạc, nhằm phát hiện lỗi và đánh giá độ ổn định của hệ thống. Nội dung gồm kiểm thử các chức năng: **đăng ký, đăng nhập, tìm kiếm và phát nhạc, quản lý danh sách bài hát, quản lý playlist, danh sách yêu thích**, kết hợp kiểm thử hiệu năng cơ bản.
@@ -29,12 +77,13 @@
 ├── app/MainProject/QuanLyThuVienNhacOnline/web/
 │   ├── src/main/…                         # Mã nguồn hệ thống
 │   ├── src/test/java/…                    # Test JUnit
-│   └── src/test/jmeter/                   # Kịch bản JMeter + hướng dẫn chạy
-├── docs/
-│   ├── TestCase_QuanLyThuVienNhac.xlsx    # Bảng test case (242 ca, 11 sheet, có kết quả)
-│   └── BaoCao_JMeter.md                   # Báo cáo chi tiết lần chạy JMeter
-├── postman/MusicLibrary.postman_collection.json   # 41 request kiểm thử endpoint
-├── selenium/                              # Kiểm thử giao diện tự động (Selenium + pytest)
+│   ├── src/test/jmeter/                   # Kịch bản JMeter + README hướng dẫn chạy
+│   ├── docs/TestCase_QuanLyThuVienNhac.xlsx # 242 ca, 11 sheet nghiệp vụ + 1 sheet Tổng quan
+│   ├── postman/MusicLibrary.postman_collection.json # 41 request kiểm thử endpoint
+│   ├── selenium/                         # Kiểm thử giao diện bằng Selenium + pytest
+│   └── images/                           # Ảnh kết quả kiểm thử, gồm JMeter
+├── postman/collections/                  # Collection Postman dạng YAML
+├── jmeter.log                            # Log hoạt động JMeter đã lưu
 └── README.md
 ```
 
@@ -52,7 +101,7 @@ Mỗi test case có mã (ví dụ `TC_ART_13`), dữ liệu vào, kết quả mo
 
 ## 4. Bảng test case và thống kê
 
-File: [`docs/TestCase_QuanLyThuVienNhac.xlsx`](docs/TestCase_QuanLyThuVienNhac.xlsx). Sheet **Tổng quan** tự đếm theo cột Trạng thái. Trạng thái Pass/Fail được ghi từ kết quả chạy thật (JUnit, JMeter); phần còn lại là *Chưa test* hoặc *Blocked*.
+File: [`TestCase_QuanLyThuVienNhac.xlsx`](web/docs/TestCase_QuanLyThuVienNhac.xlsx). Sheet **Tổng quan** tự đếm theo cột Trạng thái. Trạng thái Pass/Fail được ghi từ kết quả chạy thật (JUnit, JMeter); phần còn lại là *Chưa test* hoặc *Blocked*.
 
 | Nhóm | Số ca | Pass | Fail | Blocked | Chưa test |
 |---|---:|---:|---:|---:|---:|
@@ -115,10 +164,10 @@ Cả 6 test fail đều cùng nguyên nhân: lỗi thật **D1** của ứng d�
 
 **Cách dùng**
 
-1. Postman → Import → chọn `postman/MusicLibrary.postman_collection.json`.
+1. Postman → Import → chọn [`MusicLibrary.postman_collection.json`](web/postman/MusicLibrary.postman_collection.json).
 2. Kiểm tra biến collection `baseUrl` (mặc định `http://localhost:8080`).
 3. Chạy ứng dụng, sau đó chạy collection theo thứ tự thư mục (Runner). Không cần tài khoản admin: collection tự đăng ký một tài khoản thường, đăng nhập và dùng tài khoản đó.
-4. Dòng lệnh (tùy chọn): `newman run postman/MusicLibrary.postman_collection.json`.
+4. Dòng lệnh (tùy chọn, chạy trong thư mục `web`): `newman run postman/MusicLibrary.postman_collection.json`.
 
 Request `00` và `GET /songs` sau đăng nhập tự lấy `_csrf` token (Spring Security đổi token sau khi đăng nhập).
 
@@ -144,13 +193,20 @@ Một số request cố ý mong `400/404` để làm bằng chứng cho lỗi **
 
 ## 7. Kiểm thử hiệu năng bằng JMeter
 
-Kịch bản: `app/MainProject/QuanLyThuVienNhacOnline/web/src/test/jmeter/music-library-load-test.jmx` . Mỗi người dùng ảo đăng nhập một lần, giữ phiên riêng, rồi lặp: trang chủ, danh sách thể loại, tìm kiếm thể loại, danh sách nghệ sĩ, danh sách bài hát, tìm kiếm bài hát. Kịch bản chỉ đọc dữ liệu, có think time 1–3 giây và assertion HTTP 200.
+Kịch bản: [`music-library-load-test.jmx`](web/src/test/jmeter/music-library-load-test.jmx). Xem [hướng dẫn chạy JMeter](web/src/test/jmeter/README.md). Mỗi người dùng ảo đăng nhập một lần, giữ phiên riêng, rồi lặp: trang chủ, danh sách thể loại, tìm kiếm thể loại, danh sách nghệ sĩ, danh sách bài hát, tìm kiếm bài hát. Kịch bản chỉ đọc dữ liệu, có think time 1–3 giây và assertion HTTP 200.
+
+Tài liệu và minh chứng JMeter hiện có:
+
+- [Ảnh kết quả mức tải thấp](web/images/jmeter-low.png), [mức tải trung bình](web/images/jmeter-medium.png) và [mức tải cao](web/images/jmeter-high.png).
+- [Log hoạt động JMeter](../../../jmeter.log). Log phục vụ theo dõi quá trình chạy, không thay thế dữ liệu kết quả `.jtl` hoặc báo cáo HTML.
+
+Phần tổng hợp kết quả được trình bày trực tiếp bên dưới.
 
 Các mức tải đã định nghĩa: Thấp (20 người dùng), Trung bình (50), Cao (100), mỗi mức 180 giây.
 
 ### Kết quả lần chạy đã thực hiện
 
-Cấu hình: **120 luồng, ramp-up 1 giây**, thời lượng 15 giây .
+Cấu hình được ghi nhận trong phần tổng hợp: **120 luồng, ramp-up 1 giây**, thời lượng cấu hình **15 giây**. Đây là số liệu của lần chạy đã được ghi lại, không phải kết quả kiểm thử mới.
 
 | Request | Số mẫu | Trung bình (ms) | Min (ms) | Max (ms) | Lỗi % |
 |---|---:|---:|---:|---:|---:|
@@ -185,7 +241,7 @@ Thông lượng khoảng 18.3 mẫu/giây.
 - Các chỉ số tối ưu này chỉ đúng với kịch bản hành trình đã thực thi trong phạm vi lần chạy kiểm thử này, không đồng nghĩa với việc hệ thống có thể chịu đựng được mọi kịch bản phức tạp ngoài đời thực hay các bài test dài hạn hơn mà không cần giám sát thêm.
 ## 8. Kiểm thử giao diện bằng Selenium
 
-Bộ test nằm tại `app/MainProject/QuanLyThuVienNhacOnline/web/selenium/` (hướng dẫn chi tiết: [`selenium/README.md`](app/MainProject/QuanLyThuVienNhacOnline/web/selenium/README.md)). Selenium WebDriver (Python) kết hợp pytest điều khiển trình duyệt Chrome thao tác trực tiếp trên **chính hệ thống quản lý thư viện nhạc**, mô phỏng người dùng thật: đăng ký, đăng nhập, đăng xuất, phân quyền, tìm kiếm và quản lý bài hát, nghệ sĩ, thể loại. Tổng cộng **72 ca**, bám **40 mã** trong bảng test case (20 mã `TC_AUT`, 20 mã `TC_PLY`); tên test và docstring đều ghi mã TC để truy vết.
+Bộ test nằm tại `app/MainProject/QuanLyThuVienNhacOnline/web/selenium/` (hướng dẫn chi tiết: [`selenium/README.md`](web/selenium/README.md)). Selenium WebDriver (Python) kết hợp pytest điều khiển trình duyệt Chrome thao tác trực tiếp trên **chính hệ thống quản lý thư viện nhạc**, mô phỏng người dùng thật: đăng ký, đăng nhập, đăng xuất, phân quyền, tìm kiếm và quản lý bài hát, nghệ sĩ, thể loại. Tổng cộng **72 ca**, bám **40 mã** trong bảng test case (20 mã `TC_AUT`, 20 mã `TC_PLY`); tên test và docstring đều ghi mã TC để truy vết.
 
 | Nhóm | File | Số ca | Mã TC liên quan | Nội dung chính |
 |---|---|---:|---|---|
